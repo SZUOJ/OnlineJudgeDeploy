@@ -3,7 +3,7 @@ services:
 
     # 后端
     oj-backend:
-        image:
+        image: aelitadoc/szuoj-be
         container_name: oj-backend
         restart: always
         volumes:
@@ -34,7 +34,7 @@ services:
 
     # 判题机
     oj-judger:
-        image: registry.cn-hangzhou.aliyuncs.com/onlinejudge/judge_server
+        image: aelitadoc/szuoj-judger-server
         container_name: judge-server
         restart: always
         read_only: true
