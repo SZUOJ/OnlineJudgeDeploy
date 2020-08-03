@@ -7,9 +7,9 @@ services:
         container_name: oj-backend
         restart: always
         volumes:
-            - ./data:/data
+            - ./data/backend:/data
         ports:
-            - 0.0.0.0:8080:
+            - "8080:8080"
         environment:
             # TODO 使用.env文件代替直接设置
             - PROJ_ENV=DEV              # 开发环境
