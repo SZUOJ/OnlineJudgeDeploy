@@ -65,7 +65,9 @@ services:
         volumes:
             - ./data/postgres:/var/lib/postgresql/data
         environment:
-
+            - POSTGRES_DB=onlinejudge
+            - POSTGRES_USER=onlinejudge
+            - POSTGRES_PASSWORD=onlinejudge
     # 缓存
     oj-redis:
         image: library/redis:6-alpine
