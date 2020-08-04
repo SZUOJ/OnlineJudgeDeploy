@@ -55,7 +55,6 @@ services:
             - SERVICE_URL=http://oj-judger:8080
             - BACKEND_URL=http://oj-backend:8000/api/judge_server_heartbeat/
             - TOKEN=CHANGE_THIS
-            - LANG=C.UTF-8
 
     # 数据库，postgresql
     oj-postgres:
@@ -68,6 +67,7 @@ services:
             - POSTGRES_DB=onlinejudge
             - POSTGRES_USER=onlinejudge
             - POSTGRES_PASSWORD=onlinejudge
+
     # 缓存
     oj-redis:
         image: library/redis:6-alpine
