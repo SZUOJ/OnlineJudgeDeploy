@@ -1,37 +1,6 @@
 version: '3'
 services:
 
-    # 后端
-    oj-backend:
-        image: aelitadoc/szuoj-be
-        container_name: oj-backend
-        restart: always
-        volumes:
-            - ./data/backend:/data
-        ports:
-            - "8080:8080"
-        environment:
-            # TODO 使用.env文件代替直接设置
-            - PROJ_ENV=DEV              # 开发环境
-#            - PROJ_ENV=PROD             # 生产环境
-
-            - DB_HOST=oj-postgres       # 数据库host
-            - DB_NAME=onlinejudge       # 数据库名
-            - DB_USER=onlinejudge       # 数据库用户
-            - DB_PASSWORD=onlinejudge   # 数据库密码
-
-            - REDIS_HOST=oj-redis
-            - REDIS_PORT=6379
-
-            - MQ_HOST=oj-mq
-            - MQ_USER=ojmq
-            - MQ_PASS=onlinejudge
-
-            - ROOT_USERNAME=root        # 后台超级管理初始用户名
-            - ROOT_PASSWORD=rootroot    # 后台超级管理初始密码
-
-            - JUDGER_SERVER_URL=http://oj-judger:8080   # 临时调试用途
-
     # 判题机
     oj-judger:
         image: aelitadoc/szuoj-judger-server
@@ -84,3 +53,39 @@ services:
         environment:
             - RABBITMQ_DEFAULT_USER=ojmq
             - RABBITMQ_DEFAULT_PASS=onlinejudge
+
+# 后端
+    oj-backend:
+        image: aelitadoc/szuoj-be
+        container_name: oj-backend
+        restart: always
+        volumes:
+            - ./data/backend:/data
+        ports:
+            - "8080:8080"
+        environment:
+            # TODO 使用.env文件代替直接设置
+            - PROJ_ENV=DEV              # 开发环境
+#            - PROJ_ENV=PROD             # 生产环境
+
+            - DB_HOST=oj-postgres       # 数据库host
+            - DB_NAME=onlinejudge       # 数据库名
+            - DB_USER=onlinejudge       # 数据库用户
+            - DB_PASSWORD=onlinejudge   # 数据库密码
+
+            - REDIS_HOST=oj-redis
+            - REDIS_PORT=6379
+
+            - MQ_HOST=oj-mq
+            - MQ_USER=ojmq
+            - MQ_PASS=onlinejudge
+
+            - ROOT_USERNAME=root        # 后台超级管理初始用户名
+            - ROOT_PASSWORD=rootroot    # 后台超级管理初始密码
+
+            - JUDGER_SERVER_URL=http://oj-judger:8080   # 临时调试用途
+        depends_on:
+          - oj-postgres
+          - oj-redis
+          - oj-mq
+          - oj-judger
