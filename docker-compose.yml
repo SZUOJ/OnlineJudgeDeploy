@@ -24,6 +24,7 @@ services:
             - DISABLE_HEARTBEAT=1
             - SERVICE_URL=http://oj-judger:8080
             - BACKEND_URL=http://oj-backend:8000/api/judge_server_heartbeat/
+            - LANG=C.UTF-8
             - TOKEN=JUDGE_SERVER_TOKEN
 
     # 数据库，postgresql
