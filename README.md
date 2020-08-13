@@ -19,6 +19,17 @@ docker-compose -f docker-compose.yml -f docker-compose-dev.yml config
 docker-compose -f docker-compose.yml -f docker-compose-dev.yml up -d
 ```
 
+- 如果在本机运行后端
+
+启动判题机、数据库、Redis、消息队列。
+```shell script
+docker-compose -f docker-compose.yml -f docker-compose-dev.yml up -d oj-judger oj-mq oj-postgres oj-redis
+```
+
+本机启动Django
+```shell script
+python manage.py runserver
+```
 ## 生产模式启动（正式部署）
 
 ```shell script

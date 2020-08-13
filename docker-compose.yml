@@ -69,9 +69,7 @@ services:
         ports:
             - "8000:8000"
         environment:
-            # TODO 使用.env文件代替直接设置
-            - PROJ_ENV=DEV              # 开发环境
-            #            - PROJ_ENV=PROD             # 生产环境
+            - PROJ_ENV=PROD             # 生产环境
 
             - DB_HOST=oj-postgres       # 数据库host
             - DB_NAME=onlinejudge       # 数据库名
