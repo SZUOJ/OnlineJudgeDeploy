@@ -31,10 +31,12 @@ docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d oj-judger o
 # 数据库初始化
 python manage.py makemigrations
 python manage.py migrate --no-input
+python manage.py inituser --username=root --password=rootroot --action=create_super_admin
 python manage.py loaddata data/fixtures/test.json
 
 # 启动开发服务器
 python manage.py runserver
+python manage.py rundramatiq
 ```
 ## 生产模式启动（正式部署）
 
