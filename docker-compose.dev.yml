@@ -14,3 +14,7 @@ services:
     oj-mq:
         ports:
             - "5672:5672"
+
+    oj-redis:
+        ports:
+            - ""

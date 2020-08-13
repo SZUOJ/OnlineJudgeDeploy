@@ -23,11 +23,17 @@ docker-compose -f docker-compose.yml -f docker-compose-dev.yml up -d
 
 启动判题机、数据库、Redis、消息队列。
 ```shell script
-docker-compose -f docker-compose.yml -f docker-compose-dev.yml up -d oj-judger oj-mq oj-postgres oj-redis
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d oj-judger oj-mq oj-postgres oj-redis
 ```
 
 本机启动Django
 ```shell script
+# 数据库初始化
+python manage.py makemigrations
+python manage.py migrate --no-input
+python manage.py loaddata data/fixtures/test.json
+
+# 启动开发服务器
 python manage.py runserver
 ```
 ## 生产模式启动（正式部署）
