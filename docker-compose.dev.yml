@@ -20,3 +20,8 @@ services:
     oj-redis:
         ports:
             - "6379:6379"
+
+    # 后端
+    oj-backend:
+        volumes:
+            - ../OnlineJudge:/app  # 开发用

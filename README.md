@@ -11,12 +11,12 @@ SZUOJ部署用
 
 - 检查配置项
 ```shell script
-docker-compose -f docker-compose.yml -f docker-compose-dev.yml config
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml config
 ```
 
 - 启动
 ```shell script
-docker-compose -f docker-compose.yml -f docker-compose-dev.yml up -d
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 ```
 
 - 如果在本机运行后端
