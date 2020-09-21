@@ -67,7 +67,6 @@ services:
         restart: always
         volumes:
             - ./data/backend:/data
-        #            - ../OnlineJudge:/app  # 开发用
         ports:
             - "8000:8000"
         environment:

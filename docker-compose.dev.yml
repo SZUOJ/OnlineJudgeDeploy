@@ -25,3 +25,5 @@ services:
     oj-backend:
         volumes:
             - ../OnlineJudge:/app  # 开发用
+        environment:
+            - PROJ_ENV=DEV
