@@ -34,6 +34,8 @@ services:
         restart: always
         volumes:
             - ./data/postgres:/var/lib/postgresql/data
+        ports:
+            - "5432:5432"
         environment:
             - POSTGRES_DB=onlinejudge
             - POSTGRES_USER=onlinejudge
