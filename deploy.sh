@@ -1,0 +1,1 @@
+sudo ln -s ~/SZUOJ/OnlineJudgeDeploy/oj.conf /etc/nginx/conf.d/oj.conf
