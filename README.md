@@ -43,3 +43,15 @@ python manage.py rundramatiq
 ```shell script
 docker-compose up -d
 ```
+
+## Nginx性能优化
+
+`sudo vim /etc/nginx/nginx.conf`
+
+```
+events {
+	use epoll;
+	worker_connections 65535;
+	multi_accept on;
+}
+```
