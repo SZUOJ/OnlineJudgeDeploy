@@ -68,7 +68,7 @@ services:
         volumes:
             - ./data/backend:/data
         ports:
-            - "8000:8000"
+            - "127.0.0.1:8000:8000"
         environment:
             - PROJ_ENV=PROD             # 生产环境
 
