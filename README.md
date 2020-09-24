@@ -55,3 +55,7 @@ events {
 	multi_accept on;
 }
 ```
+
+## Postgresql性能优化
+
+参照https://pgtune.leopard.in.ua/#/
