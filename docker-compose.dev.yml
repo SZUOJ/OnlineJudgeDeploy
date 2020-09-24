@@ -23,6 +23,7 @@ services:
 
     # 后端
     oj-backend:
+        image: aelitadoc/szuoj-be:develop
         volumes:
             - ../OnlineJudge:/app  # 开发用
         environment:
