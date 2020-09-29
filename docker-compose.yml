@@ -26,6 +26,7 @@ services:
             - BACKEND_URL=http://oj-backend:8000/api/judge_server_heartbeat/
             - LANG=C.UTF-8
             - TOKEN=JUDGE_SERVER_TOKEN
+            # - judger_debug=1
 
     # 数据库，postgresql
     oj-postgres:
@@ -36,7 +37,7 @@ services:
             - ./data/postgres:/var/lib/postgresql/data
             - ./conf/postgresql.conf:/var/lib/postgresql/data/postgresql.conf  # 挂载自定义配置文件
         ports:
-            - "5432:5432"
+            - "127.0.0.1:5432:5432"
         environment:
             - POSTGRES_DB=onlinejudge
             - POSTGRES_USER=onlinejudge
@@ -77,6 +78,8 @@ services:
             - DB_NAME=onlinejudge       # 数据库名
             - DB_USER=onlinejudge       # 数据库用户
             - DB_PASSWORD=onlinejudge   # 数据库密码
+            - POOL_SIZE=100
+            - MAX_OVERFLOW=100
 
             - REDIS_HOST=oj-redis
             - REDIS_PORT=6379
