@@ -21,11 +21,10 @@ services:
             - ./data/judge_server/log:/log
             - ./data/judge_server/run:/judger
         environment:
-            - DISABLE_HEARTBEAT=1
             - SERVICE_URL=http://oj-judger:8080
             - BACKEND_URL=http://oj-backend:8000/api/judge_server_heartbeat/
             - LANG=C.UTF-8
-            - TOKEN=JUDGE_SERVER_TOKEN
+            - TOKEN=${JUDGE_SERVER_TOKEN}
             # - judger_debug=1
 
     # 数据库，postgresql
@@ -35,13 +34,16 @@ services:
         restart: always
         volumes:
             - ./data/postgres:/var/lib/postgresql/data
-            - ./conf/postgresql.conf:/var/lib/postgresql/data/postgresql.conf  # 挂载自定义配置文件
+            - ./conf/postgresql.conf:/var/lib/postgresql/data/postgresql.conf:ro  # 挂载自定义配置文件（只读）
         ports:
             - "127.0.0.1:5432:5432"
         environment:
-            - POSTGRES_DB=onlinejudge
-            - POSTGRES_USER=onlinejudge
-            - POSTGRES_PASSWORD=onlinejudge
+            - POSTGRES_DB=${DB_NAME}
+            - POSTGRES_USER=${DB_USER}
+            - POSTGRES_PASSWORD=${DB_PASSWORD}
+
+    oj-pgbouncer:
+        image: pgbouncer/pgbouncer:1.14.0
 
     # 缓存
     oj-redis:
@@ -59,8 +61,8 @@ services:
         volumes:
             - ./data/rabbitmq:/var/lib/rabbitmq
         environment:
-            - RABBITMQ_DEFAULT_USER=ojmq
-            - RABBITMQ_DEFAULT_PASS=onlinejudge
+            - RABBITMQ_DEFAULT_USER=${MQ_USER}
+            - RABBITMQ_DEFAULT_PASS=${MQ_PASS}
 
     # 后端
     oj-backend:
@@ -72,26 +74,25 @@ services:
         ports:
             - "127.0.0.1:8000:8000"
         environment:
-            - PROJ_ENV=PROD             # 生产环境
+            - PROJ_ENV
 
-            - DB_HOST=oj-postgres       # 数据库host
-            - DB_NAME=onlinejudge       # 数据库名
-            - DB_USER=onlinejudge       # 数据库用户
-            - DB_PASSWORD=onlinejudge   # 数据库密码
-            - POOL_SIZE=100
-            - MAX_OVERFLOW=100
+            - DB_HOST
+            - DB_NAME
+            - DB_USER
+            - DB_PASSWORD
 
-            - REDIS_HOST=oj-redis
-            - REDIS_PORT=6379
+            - REDIS_HOST
+            - REDIS_PORT
 
-            - MQ_HOST=oj-mq
-            - MQ_USER=ojmq
-            - MQ_PASS=onlinejudge
+            - MQ_HOST
+            - MQ_USER
+            - MQ_PASS
 
-            - ROOT_USERNAME=root        # 后台超级管理初始用户名
-            - ROOT_PASSWORD=rootroot    # 后台超级管理初始密码
+            - ROOT_USERNAME
+            - ROOT_PASSWORD
 
-            - JUDGER_SERVER_URL=http://oj-judger:8080   # 临时调试用途
+            - JUDGER_SERVER_URL
+            - JUDGE_SERVER_TOKEN
         depends_on:
             - oj-postgres
             - oj-redis

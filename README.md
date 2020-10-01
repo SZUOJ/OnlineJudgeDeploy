@@ -40,8 +40,10 @@ python manage.py rundramatiq
 ```
 ## 生产模式启动（正式部署）
 
+使用环境变量文件`./conf/.env.prod`进行配置
 ```shell script
-docker-compose up -d
+docker-compose --env-file ./conf/.env.prod config  # 检查配置
+docker-compose --env-file ./conf/.env.prod up -d  # 启动
 ```
 
 ## Nginx性能优化
