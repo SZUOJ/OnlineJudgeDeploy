@@ -33,6 +33,8 @@ services:
         image: library/postgres:12-alpine
         container_name: oj-postgres
         restart: always
+        ports:
+            - '127.0.0.1:5432:5432'  # 端口暴露至本地，可通过SSH隧道登录
         volumes:
             - ./data/postgres:/var/lib/postgresql/data
             - ./conf/postgresql.conf:/var/lib/postgresql/data/postgresql.conf:ro  # 挂载自定义配置文件（只读）
@@ -62,7 +64,6 @@ services:
             - DATABASES_RESERVE_POOL=50
             - PGBOUNCER_MAX_CLIENT_CONN=1000
 
-
     # 缓存
     oj-redis:
         image: library/redis:6-alpine
@@ -90,7 +91,7 @@ services:
         volumes:
             - ./data/backend:/app/data
         ports:
-            - "127.0.0.1:8000:8000"
+            - '127.0.0.1:8000:8000'
         environment:
             - PROJ_ENV
 
