@@ -61,5 +61,8 @@ events {
 ```
 
 ## Postgresql性能优化
-
+pgbouncer
+```shell script
+psql -h oj-pgbouncer -p 6432 -U pgboucer
+```
 参照https://pgtune.leopard.in.ua/#/
