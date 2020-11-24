@@ -37,7 +37,7 @@ services:
       - '127.0.0.1:5432:5432'
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
-    #            - ./conf/postgresql.conf:/var/lib/postgresql/data/postgresql.conf:ro  # 挂载自定义配置文件（只读）
+    # - ./conf/postgresql.conf:/var/lib/postgresql/data/postgresql.conf:ro  # 挂载自定义配置文件（只读）
     environment:
       - POSTGRES_DB=${DB_NAME}
       - POSTGRES_USER=${DB_USER}
