@@ -44,8 +44,8 @@ python manage.py rundramatiq
 
 使用环境变量文件`./conf/.env.prod`进行配置
 ```shell script
-docker-compose --env-file ./conf/.env.prod config  # 检查配置
-docker-compose --env-file ./conf/.env.prod up -d  # 启动
+docker-compose config  # 检查配置
+docker-compose up -d  # 启动
 ```
 
 ## Nginx性能优化
@@ -61,8 +61,18 @@ events {
 ```
 
 ## Postgresql性能优化
-pgbouncer
-```shell script
-psql -h oj-pgbouncer -p 6432 -U pgboucer
+
+参照`https://pgtune.leopard.in.ua/#/`进行设置
+
+
+## docker容器web可视化管理
+
+```shell
+docker run -d -p 9000:9000 --restart=always \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    --name portainer portainer/portainer
 ```
-参照https://pgtune.leopard.in.ua/#/
+
+启动后即可在9000端口访问可视化管理页面
+
+对于同一服务器的情况，选用`Local`模式即可
