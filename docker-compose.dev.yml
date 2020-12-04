@@ -49,6 +49,7 @@ services:
     image: aelitadoc/szuoj-be:develop
     volumes:
       - ../OnlineJudge:/app  # 开发用
+      - backend_static:/app/data/static
     environment:
       - PROJ_ENV=DEV
       - DB_HOST=oj-pgbouncer
@@ -59,3 +60,10 @@ services:
       - oj-mq
       - oj-judger
       - oj-pgbouncer
+
+  oj-frontend:
+    volumes:
+      - backend_static:/app/backend_static
+
+volumes:
+  backend_static:
