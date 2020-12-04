@@ -23,26 +23,8 @@ services:
 
   # 数据库连接池
   oj-pgbouncer:
-    image: pgbouncer/pgbouncer:1.14.0
-    container_name: oj-pgbouncer
-    restart: always
-    depends_on:
-      - oj-postgres
     ports:
       - "6432:6432"
-    environment:
-      - PGBOUNCER_LISTEN_PORT=${PG_BOUNCER_PORT}
-
-      - DATABASES_HOST=${DB_HOST}
-      - DATABASES_PORT=${DB_PORT}
-      - DATABASES_DBNAME=${DB_NAME}
-      - DATABASES_USER=${DB_USER}
-      - DATABASES_PASSWORD=${DB_PASSWORD}
-
-      - DATABASES_POOL_MODE=transaction
-      - DATABASES_POOL_SIZE=50
-      - DATABASES_RESERVE_POOL=50
-      - PGBOUNCER_MAX_CLIENT_CONN=1000
 
   # 后端
   oj-backend:
@@ -52,14 +34,6 @@ services:
       - backend_static:/app/data/static
     environment:
       - PROJ_ENV=DEV
-      - DB_HOST=oj-pgbouncer
-      - DB_PORT=${PG_BOUNCER_PORT}
-    depends_on:
-      - oj-postgres
-      - oj-redis
-      - oj-mq
-      - oj-judger
-      - oj-pgbouncer
 
   oj-frontend:
     volumes:

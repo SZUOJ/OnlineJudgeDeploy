@@ -43,6 +43,27 @@ services:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
 
+  # 数据库连接池
+  oj-pgbouncer:
+    image: pgbouncer/pgbouncer:1.14.0
+    container_name: oj-pgbouncer
+    restart: always
+    depends_on:
+      - oj-postgres
+    environment:
+      - PGBOUNCER_LISTEN_PORT=${PG_BOUNCER_PORT}
+
+      - DATABASES_HOST=${DB_HOST}
+      - DATABASES_PORT=${DB_PORT}
+      - DATABASES_DBNAME=${DB_NAME}
+      - DATABASES_USER=${DB_USER}
+      - DATABASES_PASSWORD=${DB_PASSWORD}
+
+      - DATABASES_POOL_MODE=transaction
+      - DATABASES_POOL_SIZE=50
+      - DATABASES_RESERVE_POOL=50
+      - PGBOUNCER_MAX_CLIENT_CONN=1000
+
   # 缓存
   oj-redis:
     image: library/redis:6-alpine
@@ -71,13 +92,13 @@ services:
       - test_case_data:/app/data/test_case
       - media_data:/app/data/media
       - ./data/backend/log:/app/data/log
-    ports:
-      - '127.0.0.1:8000:8000'
+#    ports:
+#      - '127.0.0.1:8000:8000'
     environment:
       - PROJ_ENV
 
-      - DB_HOST
-      - DB_PORT
+      - DB_HOST=oj-pgbouncer
+      - DB_PORT=${PG_BOUNCER_PORT}
       - DB_NAME
       - DB_USER
       - DB_PASSWORD
