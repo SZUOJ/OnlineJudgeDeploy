@@ -92,8 +92,6 @@ services:
       - test_case_data:/app/data/test_case
       - media_data:/app/data/media
       - ./data/backend/log:/app/data/log
-#    ports:
-#      - '127.0.0.1:8000:8000'
     environment:
       - PROJ_ENV
 
@@ -120,11 +118,13 @@ services:
       - oj-redis
       - oj-mq
       - oj-judger
+      - oj-pgbouncer
 
-
+  # Nginx + 前端
   oj-frontend:
     image: registry.cn-shenzhen.aliyuncs.com/szuoj/frontend:latest
     container_name: oj-frontend
+    restart: always
     depends_on:
       - oj-backend
     ports:
@@ -134,6 +134,15 @@ services:
       - ./conf/nginx/conf.d:/etc/nginx/conf.d:ro
       - ./conf/nginx/nginx.conf:/etc/nginx/nginx.conf
 
+  portainer:
+    image: portainer/portainer-ce:alpine
+    container_name: portainer
+    restart: always
+    ports:
+      - '9000:9000'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
 
 volumes:
   pg_data:
@@ -141,3 +150,4 @@ volumes:
   mq_data:
   media_data:
   test_case_data:
+  portainer_data:
