@@ -3,6 +3,7 @@ services:
 
   # 判题机
   oj-judger:
+    image: szuoj/judge_server:develop
     ports:
       - "12358:8080"
 
