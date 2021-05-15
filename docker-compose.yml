@@ -46,17 +46,6 @@ services:
     volumes:
       - rdb_data:/data
 
-  # 消息队列
-  oj-mq:
-    image: library/rabbitmq:3-alpine
-    container_name: oj-mq
-    restart: always
-    volumes:
-      - mq_data:/var/lib/rabbitmq
-    environment:
-      - RABBITMQ_DEFAULT_USER=${MQ_USER}
-      - RABBITMQ_DEFAULT_PASS=${MQ_PASS}
-
   # 后端
   oj-backend:
     image: registry.cn-shenzhen.aliyuncs.com/szuoj/backend:latest
@@ -78,10 +67,6 @@ services:
       - REDIS_HOST
       - REDIS_PORT
 
-      - MQ_HOST
-      - MQ_USER
-      - MQ_PASS
-
       - ROOT_USERNAME
       - ROOT_PASSWORD
 
@@ -90,7 +75,6 @@ services:
     depends_on:
       - oj-postgres
       - oj-redis
-      - oj-mq
       - oj-pgbouncer
 
   # Nginx + 前端
@@ -106,6 +90,7 @@ services:
       - media_data:/app/data/media:ro
       - ./conf/nginx/oj.conf:/etc/nginx/conf.d/oj.conf:ro
       - ./conf/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./data/nginx/log:/var/log/nginx
 
   # 判题机
   oj-judger:
@@ -149,7 +134,6 @@ services:
 volumes:
   pg_data:
   rdb_data:
-  mq_data:
   media_data:
   test_case_data:
   portainer_data:

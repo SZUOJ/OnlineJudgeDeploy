@@ -12,11 +12,6 @@ services:
     ports:
       - "5432:5432"
 
-  # 消息队列
-  oj-mq:
-    ports:
-      - "5672:5672"
-
   # redis
   oj-redis:
     ports:
