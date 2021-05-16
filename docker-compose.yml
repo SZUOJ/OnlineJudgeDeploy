@@ -42,7 +42,6 @@ services:
     image: library/redis:6-alpine
     container_name: oj-redis
     restart: always
-    command: redis-server --appendonly yes  # 启用持久化
     volumes:
       - rdb_data:/data
 
