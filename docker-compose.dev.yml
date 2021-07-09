@@ -5,35 +5,37 @@ services:
   oj-judger:
     image: szuoj/judge_server:develop
     ports:
-      - "12358:8080"
+    - "12358:8080"
 
   # 数据库，postgresql
   oj-postgres:
     ports:
-      - "5432:5432"
+    - "5432:5432"
 
   # redis
   oj-redis:
     ports:
-      - "6379:6379"
+    - "6379:6379"
 
   # 数据库连接池
   oj-pgbouncer:
     ports:
-      - "6432:6432"
+    - "6432:6432"
 
   # 后端
   oj-backend:
     image: aelitadoc/szuoj-be:develop
     volumes:
-      - ../OnlineJudge:/app  # 开发用
-      - backend_static:/app/data/static
+    - ../OnlineJudge:/app  # 开发用
+    - backend_static:/app/data/static
     environment:
-      - PROJ_ENV=DEV
+    - PROJ_ENV=DEV
+#    - DEV_SERVER_HOST=  # 配置开发服务器IP
 
   oj-frontend:
     volumes:
-      - backend_static:/app/backend_static
+    - backend_static:/app/backend_static
+    - ./dist/:/app/dist/
 
 volumes:
   backend_static:
