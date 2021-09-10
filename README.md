@@ -12,24 +12,27 @@ SZUOJ部署用
 使用多个-f参数追加（或覆盖）了原文件的配置
 
 - 检查配置项
-```shell script
+
+```sh
 docker-compose -f docker-compose.yml -f docker-compose.dev.yml --env-file ./conf/.env.dev config
 ```
 
 - 启动
-```shell script
+
+```sh
 docker-compose -f docker-compose.yml -f docker-compose.dev.yml --env-file ./conf/.env.dev up -d
 ```
 
 - 如果在本机运行后端
 
 启动判题机、数据库、Redis、消息队列。
-```shell script
+
+```sh
 docker-compose -f docker-compose.yml -f docker-compose.dev.yml --env-file ./conf/.env.dev up -d oj-judger oj-mq oj-postgres oj-redis oj-pgbouncer
 ```
 
 本机启动Django
-```shell script
+```sh
 # 数据库初始化
 python manage.py makemigrations
 python manage.py migrate --no-input
@@ -43,7 +46,8 @@ python manage.py rundramatiq
 ## 生产模式启动（正式部署）
 
 使用环境变量文件`./conf/.env.prod`进行配置
-```shell script
+
+```sh
 docker-compose config  # 检查配置
 docker-compose up -d  # 启动
 ```
@@ -67,7 +71,7 @@ events {
 
 ## docker容器web可视化管理
 
-```shell
+```sh
 docker run -d -p 9000:9000 --restart=always \
     -v /var/run/docker.sock:/var/run/docker.sock \
     --name portainer portainer/portainer
