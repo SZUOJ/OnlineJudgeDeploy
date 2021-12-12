@@ -3,7 +3,7 @@ services:
 
   # 判题机
   oj-judger:
-    image: szuoj/judge_server:develop
+    image: registry.cn-shenzhen.aliyuncs.com/szuoj/judge_server:develop
     ports:
     - "12358:8080"
 
@@ -24,7 +24,7 @@ services:
 
   # 后端
   oj-backend:
-    image: aelitadoc/szuoj-be:develop
+    image: registry.cn-shenzhen.aliyuncs.com/szuoj/backend:develop
     volumes:
     - ../OnlineJudge:/app  # 开发用
     - backend_static:/app/data/static
