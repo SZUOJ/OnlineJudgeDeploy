@@ -1,0 +1,140 @@
+# 预发布环境
+
+version: '3'
+services:
+
+  # 数据库，postgresql
+  oj-postgres:
+    image: library/postgres:12-alpine
+    container_name: oj-postgres
+    restart: always
+    ports:
+      - '127.0.0.1:5432:5432'
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    # - ./conf/postgresql.conf:/var/lib/postgresql/data/postgresql.conf:ro  # 挂载自定义配置文件（只读）
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+
+  # 数据库连接池
+  oj-pgbouncer:
+    image: pgbouncer/pgbouncer:1.15.0
+    container_name: oj-pgbouncer
+    restart: always
+    depends_on:
+      - oj-postgres
+    environment:
+      - PGBOUNCER_LISTEN_PORT=${PG_BOUNCER_PORT}
+
+      - DATABASES_HOST=${DB_HOST}
+      - DATABASES_PORT=${DB_PORT}
+      - DATABASES_DBNAME=${DB_NAME}
+      - DATABASES_USER=${DB_USER}
+      - DATABASES_PASSWORD=${DB_PASSWORD}
+
+      - DATABASES_POOL_MODE=session
+      - DATABASES_POOL_SIZE=50
+      - DATABASES_RESERVE_POOL=50
+      - PGBOUNCER_MAX_CLIENT_CONN=1000
+
+  # 缓存
+  oj-redis:
+    image: library/redis:6-alpine
+    container_name: oj-redis
+    restart: always
+    volumes:
+      - rdb_data:/data
+
+  # 后端
+  oj-backend:
+    image: registry.cn-shenzhen.aliyuncs.com/szuoj/backend:master
+    container_name: oj-backend
+    restart: always
+    volumes:
+      - test_case_data:/app/data/test_case
+      - media_data:/app/data/media
+      - ./data/backend/log:/app/data/log
+    environment:
+      - PROJ_ENV
+
+      - DB_HOST=oj-pgbouncer
+      - DB_PORT=${PG_BOUNCER_PORT}
+      - DB_NAME
+      - DB_USER
+      - DB_PASSWORD
+
+      - REDIS_HOST
+      - REDIS_PORT
+
+      - ROOT_USERNAME
+      - ROOT_PASSWORD
+
+      - JUDGER_SERVER_URL
+      - JUDGE_SERVER_TOKEN
+    depends_on:
+      - oj-postgres
+      - oj-redis
+      - oj-pgbouncer
+
+  # Nginx + 前端
+  oj-frontend:
+    image: registry.cn-shenzhen.aliyuncs.com/szuoj/frontend:master
+    container_name: oj-frontend
+    restart: always
+    depends_on:
+      - oj-backend
+    ports:
+      - '80:80'
+    volumes:
+      - media_data:/app/data/media:ro
+      - ./conf/nginx/oj.conf:/etc/nginx/conf.d/oj.conf:ro
+      - ./conf/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      # - ./data/nginx/log:/var/log/nginx  # Nginx日志映射至宿主机
+
+  # 判题机
+  oj-judger:
+    image: szuoj/judge_server:latest
+    container_name: oj-judger
+    restart: always
+    read_only: true
+    cap_drop:
+      - SETPCAP
+      - MKNOD
+      - NET_BIND_SERVICE
+      - SYS_CHROOT
+      - SETFCAP
+      - FSETID
+    tmpfs:
+      - /tmp
+    volumes:
+      - test_case_data:/test_case:ro
+      - ./data/judge_server/log:/log
+      - ./data/judge_server/run:/judger
+    environment:
+      - SERVICE_URL=http://oj-judger:8080
+      - BACKEND_URL=http://oj-backend:8000/api/manage/sys/judge_server/heartbeat/
+      - LANG=C.UTF-8
+      - TOKEN=${JUDGE_SERVER_TOKEN}
+      # - judger_debug=1
+    depends_on:
+      - oj-backend
+
+  portainer:
+    image: portainer/portainer-ce:alpine
+    container_name: portainer
+    restart: always
+    ports:
+      - '9000:9000'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+
+
+volumes:
+  pg_data:
+  rdb_data:
+  media_data:
+  test_case_data:
+  portainer_data:

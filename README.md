@@ -7,7 +7,7 @@ SZUOJ部署用
 
 3. docker-compose启动
 
-## 开发模式启动
+## 开发模式启动（开发环境部署）
 
 使用多个-f参数追加（或覆盖）了原文件的配置
 
@@ -43,9 +43,17 @@ python manage.py loaddata data/fixtures/test.json
 python manage.py runserver
 python manage.py rundramatiq
 ```
+
+## 预发布环境启动
+
+```sh
+docker-compose config  # 检查配置
+docker-compose -f docker-compose.pre.yml up -d  # 启动
+```
+
 ## 生产模式启动（正式部署）
 
-使用环境变量文件`./conf/.env.prod`进行配置
+使用环境变量文件`.env`进行配置
 
 ```sh
 docker-compose config  # 检查配置
