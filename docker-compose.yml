@@ -89,6 +89,9 @@ services:
       - media_data:/app/data/media:ro
       - ./conf/nginx/oj.conf:/etc/nginx/conf.d/oj.conf:ro
       - ./conf/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./conf/nginx/ssl.conf:/etc/nginx/ssl.conf:ro
+      - ./conf/nginx/url.conf:/etc/nginx/url.conf:ro
+      - ./conf/ssl:/app/ssl:ro
       # - ./data/nginx/log:/var/log/nginx  # Nginx日志映射至宿主机
 
   # 判题机
