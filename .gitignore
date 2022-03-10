@@ -1,4 +1,10 @@
 .idea/
 *.log
 *.rdb
+
 data/*
+!data/.gitkeep
+
+
+dist/*
+!dist/.gitkeep
