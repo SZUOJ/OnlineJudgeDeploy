@@ -136,8 +136,6 @@ services:
 #    image: registry.cn-shenzhen.aliyuncs.com/szuoj/lint-server:latest
 #    container_name: oj-lint-server
 #    restart: always
-#    ports:
-#      - '8080:8080'
 #    volumes:
 #      - ./data/lint_server/log:/app/log
 

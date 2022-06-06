@@ -91,6 +91,9 @@ services:
       - media_data:/app/data/media:ro
       - ./conf/nginx/oj.conf:/etc/nginx/conf.d/oj.conf:ro
       - ./conf/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./conf/nginx/ssl.conf:/etc/nginx/ssl.conf:ro
+      - ./conf/nginx/url.conf:/etc/nginx/url.conf:ro
+      - ./conf/ssl:/app/ssl:ro
       # - ./data/nginx/log:/var/log/nginx  # Nginx日志映射至宿主机
 
   # 判题机
@@ -131,6 +134,14 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
 
+  # 代码规范检查服务器
+  # 可选组件，需要在系统设置中开启才能使用；如果不需要启动该组件，可将其注释
+  oj-lint-server:
+    image: registry.cn-shenzhen.aliyuncs.com/szuoj/lint-server:latest
+    container_name: oj-lint-server
+    restart: always
+    volumes:
+      - ./data/lint_server/log:/app/log
 
 volumes:
   pg_data:
