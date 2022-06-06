@@ -98,7 +98,7 @@ services:
 
   # 判题机
   oj-judger:
-    image: szuoj/judge_server:latest
+    image: registry.cn-shenzhen.aliyuncs.com/szuoj/judge_server:master
     container_name: oj-judger
     restart: always
     read_only: true
