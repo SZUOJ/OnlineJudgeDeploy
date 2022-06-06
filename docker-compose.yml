@@ -119,8 +119,6 @@ services:
       - LANG=C.UTF-8
       - TOKEN=${JUDGE_SERVER_TOKEN}
       # - judger_debug=1
-    depends_on:
-      - oj-backend
 
   portainer:
     image: portainer/portainer-ce:alpine
@@ -132,6 +130,16 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
 
+  # 代码规范检查服务器
+  # 可选组件，需要在系统设置中开启才能使用；如果不需要启动该组件，可将其注释
+#  oj-lint-server:
+#    image: registry.cn-shenzhen.aliyuncs.com/szuoj/lint-server:latest
+#    container_name: oj-lint-server
+#    restart: always
+#    ports:
+#      - '8080:8080'
+#    volumes:
+#      - ./data/lint_server/log:/app/log
 
 volumes:
   pg_data:
