@@ -5,30 +5,30 @@ SZUOJ部署用
 
 2. 调整Nginx配置文件`oj.conf`(User名)、环境变量配置文件`.env.prod`的设置
 
-3. docker-compose启动
+3. docker compose启动（原 docker-compose 已被 docker 插件代替）
 
 ## 开发模式启动（开发环境部署）
 
-使用多个-f参数追加（或覆盖）了原文件的配置
+使用多个`-f`参数追加（或覆盖）了原文件的配置
 
 - 检查配置项
 
 ```sh
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml --env-file ./conf/.env.dev config
+docker compose -f docker-compose.yml -f docker-compose.dev.yml --env-file ./conf/.env.unittest.dev config
 ```
 
 - 启动
 
 ```sh
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml --env-file ./conf/.env.dev up -d
+docker compose -f docker-compose.yml -f docker-compose.dev.yml --env-file ./conf/.env.unittest.dev up -d
 ```
 
 - 如果在本机运行后端
 
-启动判题机、数据库、Redis、消息队列。
+启动判题机、数据库、Redis。
 
 ```sh
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml --env-file ./conf/.env.dev up -d oj-judger oj-mq oj-postgres oj-redis oj-pgbouncer
+docker compose -f docker-compose.yml -f docker-compose.dev.yml --env-file ./conf/.env.unittest.dev up -d oj-judger oj-postgres oj-redis oj-pgbouncer
 ```
 
 本机启动Django
@@ -47,8 +47,8 @@ python manage.py rundramatiq
 ## 预发布环境启动
 
 ```sh
-docker-compose config  # 检查配置
-docker-compose -f docker-compose.pre.yml up -d  # 启动
+docker compose config  # 检查配置
+docker compose -f docker-compose.pre.yml up -d  # 启动
 ```
 
 ## 生产模式启动（正式部署）
@@ -56,8 +56,8 @@ docker-compose -f docker-compose.pre.yml up -d  # 启动
 使用环境变量文件`.env`进行配置
 
 ```sh
-docker-compose config  # 检查配置
-docker-compose up -d  # 启动
+docker compose config  # 检查配置
+docker compose up -d  # 启动
 ```
 
 ## Nginx性能优化
@@ -74,7 +74,7 @@ events {
 
 ## Postgresql性能优化
 
-参照`https://pgtune.leopard.in.ua/#/`进行设置
+参照 https://pgtune.leopard.in.ua/#/ 进行设置
 
 
 ## docker容器web可视化管理
