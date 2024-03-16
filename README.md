@@ -14,13 +14,13 @@ SZUOJ部署用
 - 检查配置项
 
 ```sh
-docker compose -f docker-compose.yml -f docker-compose.dev.yml --env-file ./conf/.env.unittest.dev config
+docker compose -f docker-compose.yml -f docker-compose.dev.yml --env-file ./conf/.env.dev config
 ```
 
 - 启动
 
 ```sh
-docker compose -f docker-compose.yml -f docker-compose.dev.yml --env-file ./conf/.env.unittest.dev up -d
+docker compose -f docker-compose.yml -f docker-compose.dev.yml --env-file ./conf/.env.dev up -d
 ```
 
 - 如果在本机运行后端
@@ -28,7 +28,7 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml --env-file ./conf
 启动判题机、数据库、Redis。
 
 ```sh
-docker compose -f docker-compose.yml -f docker-compose.dev.yml --env-file ./conf/.env.unittest.dev up -d oj-judger oj-postgres oj-redis oj-pgbouncer
+docker compose -f docker-compose.yml -f docker-compose.dev.yml --env-file ./conf/.env.dev up -d oj-judger oj-postgres oj-redis oj-pgbouncer
 ```
 
 本机启动Django

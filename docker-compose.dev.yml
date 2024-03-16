@@ -4,6 +4,7 @@ services:
   # 判题机
   oj-judger:
     image: registry.cn-shenzhen.aliyuncs.com/szuoj/judge_server:develop
+    container_name: oj-judger-dev
     #    read_only: false
     #    volumes:
     #      - ../JudgeServer/server:/server
@@ -12,17 +13,24 @@ services:
 
   # 数据库，postgresql
   oj-postgres:
+    container_name: oj-postgres-dev
     ports:
       - "5432:5432"
 
+  # redis
+  oj-redis:
+    container_name: oj-redis-dev
+
   # 数据库连接池
   oj-pgbouncer:
+    container_name: oj-pgbouncer-dev
     ports:
       - "6432:6432"
 
   # 后端
   oj-backend:
     image: registry.cn-shenzhen.aliyuncs.com/szuoj/backend:develop
+    container_name: oj-backend-dev
     volumes:
       - ../OnlineJudge:/app  # 开发用
       - backend_static:/app/data/static
@@ -30,7 +38,21 @@ services:
       - PROJ_ENV=DEV
   #    - DEV_SERVER_HOST=  # 配置开发服务器IP
 
+  oj-backend-celery-beat:
+    image: registry.cn-shenzhen.aliyuncs.com/szuoj/backend:develop
+    container_name: oj-backend-celery-beat-dev
+    volumes:
+      - ../OnlineJudge:/app  # 开发用
+
+  # 后端 celery worker 进程
+  oj-backend-celery-worker:
+    image: registry.cn-shenzhen.aliyuncs.com/szuoj/backend:develop
+    container_name: oj-backend-celery-worker-dev
+    volumes:
+      - ../OnlineJudge:/app  # 开发用
+
   oj-frontend:
+    container_name: oj-frontend-dev
     volumes:
       - backend_static:/app/backend_static
       - ./dist/:/app/dist/

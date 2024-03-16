@@ -65,6 +65,7 @@ services:
       - test_case_data:/app/data/test_case
       - media_data:/app/data/media
       - ./data/backend/log:/app/data/log
+      - ./data/backend/config:/app/data/config
     environment:
       - PROJ_ENV
 
@@ -102,7 +103,7 @@ services:
       disable: true
     environment:
       - PROGRAM=celery_beat
-    entrypoint: [ "/bin/sh", "-c", "celery beat -l info -f /app/data/log/celery_beat.log" ]
+    entrypoint: [ "/bin/sh", "-c", "celery -A OnlineJudge beat -l info -f /app/data/log/celery_beat.log" ]
 
   # 后端 celery worker 进程
   oj-backend-celery-worker:
