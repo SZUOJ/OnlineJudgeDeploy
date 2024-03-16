@@ -51,11 +51,17 @@ services:
   oj-backend:
     image: registry.cn-shenzhen.aliyuncs.com/szuoj/backend:master
     container_name: oj-backend
+    healthcheck:
+      test: "curl --fail --silent --write-out 'HTTP CODE : %{http_code}\n' --output /dev/null http://127.0.0.1:8000/api/info/ping/"
+      interval: 5s
+      timeout: 1s
+      retries: 3
     restart: always
     volumes:
       - test_case_data:/app/data/test_case
       - media_data:/app/data/media
       - ./data/backend/log:/app/data/log
+      - ./data/backend/config:/app/data/config
     environment:
       - PROJ_ENV
 
@@ -74,9 +80,36 @@ services:
       - JUDGER_SERVER_URL
       - JUDGE_SERVER_TOKEN
     depends_on:
-      - oj-postgres
-      - oj-redis
-      - oj-pgbouncer
+      oj-postgres:
+        condition: service_healthy
+      oj-redis:
+        condition: service_healthy
+      oj-pgbouncer:
+        condition: service_started
+
+  # 后端 celery beat 进程
+  oj-backend-celery-beat:
+    # extends 关键字 继承后端的配置
+    extends:
+      service: oj-backend
+    container_name: oj-backend-celery-beat
+    healthcheck:
+      disable: true
+    environment:
+      - PROGRAM=celery_beat
+    entrypoint: [ "/bin/sh", "-c", "celery -A OnlineJudge beat -l info -f /app/data/log/celery_beat.log" ]
+
+  # 后端 celery worker 进程
+  oj-backend-celery-worker:
+    # extends 关键字 继承后端的配置
+    extends:
+      service: oj-backend
+    container_name: oj-backend-celery-worker
+    healthcheck:
+      disable: true
+    environment:
+      - PROGRAM=celery_worker
+    entrypoint: [ "/bin/sh", "-c", "celery -A OnlineJudge worker -l info -f /app/data/log/celery_worker.log" ]
 
   # Nginx + 前端
   oj-frontend:
