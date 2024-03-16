@@ -7,6 +7,11 @@ services:
   oj-postgres:
     image: library/postgres:12-alpine
     container_name: oj-postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     restart: always
     ports:
       - '127.0.0.1:5432:5432'
@@ -20,29 +25,29 @@ services:
 
   # 数据库连接池
   oj-pgbouncer:
-    image: pgbouncer/pgbouncer:1.15.0
+    image: bitnami/pgbouncer:1.21.0
     container_name: oj-pgbouncer
     restart: always
     depends_on:
       - oj-postgres
     environment:
-      - PGBOUNCER_LISTEN_PORT=${PG_BOUNCER_PORT}
-
-      - DATABASES_HOST=${DB_HOST}
-      - DATABASES_PORT=${DB_PORT}
-      - DATABASES_DBNAME=${DB_NAME}
-      - DATABASES_USER=${DB_USER}
-      - DATABASES_PASSWORD=${DB_PASSWORD}
-
-      - DATABASES_POOL_MODE=session
-      - DATABASES_POOL_SIZE=50
-      - DATABASES_RESERVE_POOL=50
+      - PGBOUNCER_PORT=${PG_BOUNCER_PORT}
       - PGBOUNCER_MAX_CLIENT_CONN=1000
+      - PGBOUNCER_DATABASE=${DB_NAME}
+      - PGBOUNCER_AUTH_TYPE=md5
+
+      - POSTGRESQL_HOST=${DB_HOST}
+      - POSTGRESQL_PORT=${DB_PORT}
+      - POSTGRESQL_DATABASE=${DB_NAME}
+      - POSTGRESQL_USERNAME=${DB_USER}
+      - POSTGRESQL_PASSWORD=${DB_PASSWORD}
 
   # 缓存
   oj-redis:
     image: library/redis:6-alpine
     container_name: oj-redis
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
     restart: always
     volumes:
       - rdb_data:/data
