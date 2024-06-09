@@ -1,0 +1,4 @@
+library/redis:/^\d+-alpine$/: registry.cn-shenzhen.aliyuncs.com/szuoj/redis
+library/postgres:/^\d+-alpine$/: registry.cn-shenzhen.aliyuncs.com/szuoj/postgres
+bitnami/pgbouncer:/^\d+\.\d+\.\d+$/: registry.cn-shenzhen.aliyuncs.com/szuoj/pgbouncer
+portainer/portainer-ce:/^alpine$/: registry.cn-shenzhen.aliyuncs.com/szuoj/portainer

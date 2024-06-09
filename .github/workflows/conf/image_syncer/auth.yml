@@ -1,0 +1,3 @@
+registry.cn-shenzhen.aliyuncs.com:
+  username: "${ALI_USERNAME}"
+  password: "${ALI_PASSWORD}"

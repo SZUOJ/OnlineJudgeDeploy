@@ -3,7 +3,7 @@ services:
 
   # 数据库，postgresql
   oj-postgres:
-    image: library/postgres:12-alpine
+    image: registry.cn-shenzhen.aliyuncs.com/szuoj/postgres:12-alpine
     container_name: oj-postgres
     restart: always
     healthcheck:
@@ -24,7 +24,7 @@ services:
 
   # 数据库连接池
   oj-pgbouncer:
-    image: bitnami/pgbouncer:1.21.0
+    image: registry.cn-shenzhen.aliyuncs.com/szuoj/pgbouncer:1.21.0
     container_name: oj-pgbouncer
     restart: always
     depends_on:
@@ -43,7 +43,7 @@ services:
 
   # 缓存
   oj-redis:
-    image: library/redis:7-alpine
+    image: registry.cn-shenzhen.aliyuncs.com/szuoj/redis:7-alpine
     container_name: oj-redis
     restart: always
     healthcheck:
@@ -162,7 +162,7 @@ services:
       # - judger_debug=1
 
   portainer:
-    image: portainer/portainer-ce:alpine
+    image: registry.cn-shenzhen.aliyuncs.com/szuoj/portainer:alpine
     container_name: portainer
     restart: always
     ports:

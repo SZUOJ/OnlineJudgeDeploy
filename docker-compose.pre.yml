@@ -44,7 +44,7 @@ services:
 
   # 缓存
   oj-redis:
-    image: library/redis:6-alpine
+    image: library/redis:7-alpine
     container_name: oj-redis
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
@@ -163,7 +163,7 @@ services:
       - oj-backend
 
   portainer:
-    image: portainer/portainer-ce:alpine
+    image: registry.cn-shenzhen.aliyuncs.com/szuoj/portainer:alpine
     container_name: portainer
     restart: always
     ports:
