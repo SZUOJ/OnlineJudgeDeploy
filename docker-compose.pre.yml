@@ -25,7 +25,7 @@ services:
 
   # 数据库连接池
   oj-pgbouncer:
-    image: bitnami/pgbouncer:1.21.0
+    image: bitnamilegacy/pgbouncer:1.21.0
     container_name: oj-pgbouncer
     restart: always
     depends_on:
