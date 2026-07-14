@@ -10,20 +10,44 @@ services:
     #      - ../JudgeServer/server:/server
     ports:
       - "12358:8080"
+    depends_on:
+      oj-backend:
+        condition: service_healthy
 
   # 数据库，postgresql
   oj-postgres:
     container_name: oj-postgres-dev
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -h 127.0.0.1 -p 5432 -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\"" ]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
     ports:
       - "5432:5432"
 
   # redis
   oj-redis:
     container_name: oj-redis-dev
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 5s
 
   # 数据库连接池
   oj-pgbouncer:
     container_name: oj-pgbouncer-dev
+    healthcheck:
+      test: [ "CMD-SHELL", "PGCONNECT_TIMEOUT=3 PGPASSWORD=\"$${POSTGRESQL_PASSWORD}\" psql -w -h 127.0.0.1 -p \"$${PGBOUNCER_PORT}\" -U \"$${POSTGRESQL_USERNAME}\" -d \"$${POSTGRESQL_DATABASE}\" -v ON_ERROR_STOP=1 -tAc 'SELECT 1'" ]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    depends_on:
+      oj-postgres:
+        condition: service_healthy
     ports:
       - "6432:6432"
 
@@ -31,11 +55,24 @@ services:
   oj-backend:
     image: registry.cn-shenzhen.aliyuncs.com/szuoj/backend:develop
     container_name: oj-backend-dev
+    healthcheck:
+      test: [ "CMD", "curl", "--fail", "--silent", "--show-error", "--output", "/dev/null", "http://127.0.0.1:8000/api/info/ready/" ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 5m
     volumes:
       - ../OnlineJudge:/app  # 开发用
       - backend_static:/app/data/static
     environment:
       - PROJ_ENV=DEV
+    depends_on:
+      oj-postgres:
+        condition: service_healthy
+      oj-redis:
+        condition: service_healthy
+      oj-pgbouncer:
+        condition: service_healthy
   #    - DEV_SERVER_HOST=  # 配置开发服务器IP
 
   oj-backend-celery-beat:
@@ -43,6 +80,9 @@ services:
     container_name: oj-backend-celery-beat-dev
     volumes:
       - ../OnlineJudge:/app  # 开发用
+    depends_on:
+      oj-backend:
+        condition: service_healthy
 
   # 后端 celery worker 进程
   oj-backend-celery-worker:
@@ -50,9 +90,15 @@ services:
     container_name: oj-backend-celery-worker-dev
     volumes:
       - ../OnlineJudge:/app  # 开发用
+    depends_on:
+      oj-backend:
+        condition: service_healthy
 
   oj-frontend:
     container_name: oj-frontend-dev
+    depends_on:
+      oj-backend:
+        condition: service_healthy
     volumes:
       - backend_static:/app/backend_static
       - ./dist/:/app/dist/

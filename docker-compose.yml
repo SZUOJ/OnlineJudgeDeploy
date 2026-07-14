@@ -7,10 +7,11 @@ services:
     container_name: oj-postgres
     restart: always
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
-      interval: 10s
+      test: [ "CMD-SHELL", "pg_isready -h 127.0.0.1 -p 5432 -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\"" ]
+      interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 12
+      start_period: 30s
     ports:
       - '127.0.0.1:5432:5432'
     volumes:
@@ -28,7 +29,14 @@ services:
     container_name: oj-pgbouncer
     restart: always
     depends_on:
-      - oj-postgres
+      oj-postgres:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "PGCONNECT_TIMEOUT=3 PGPASSWORD=\"$${POSTGRESQL_PASSWORD}\" psql -w -h 127.0.0.1 -p \"$${PGBOUNCER_PORT}\" -U \"$${POSTGRESQL_USERNAME}\" -d \"$${POSTGRESQL_DATABASE}\" -v ON_ERROR_STOP=1 -tAc 'SELECT 1'" ]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
     environment:
       - PGBOUNCER_PORT=${PG_BOUNCER_PORT}
       - PGBOUNCER_MAX_CLIENT_CONN=1000
@@ -48,6 +56,10 @@ services:
     restart: always
     healthcheck:
       test: [ "CMD", "redis-cli","ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 5s
     volumes:
       - rdb_data:/data
 
@@ -56,10 +68,11 @@ services:
     image: registry.cn-shenzhen.aliyuncs.com/szuoj/backend:latest
     container_name: oj-backend
     healthcheck:
-      test: "curl --fail --silent --write-out 'HTTP CODE : %{http_code}\n' --output /dev/null http://127.0.0.1:8000/api/info/ping/"
+      test: [ "CMD", "curl", "--fail", "--silent", "--show-error", "--output", "/dev/null", "http://127.0.0.1:8000/api/info/ready/" ]
       interval: 5s
-      timeout: 1s
-      retries: 3
+      timeout: 3s
+      retries: 20
+      start_period: 5m
     restart: always
     volumes:
       - test_case_data:/app/data/test_case
@@ -91,7 +104,7 @@ services:
       oj-redis:
         condition: service_healthy
       oj-pgbouncer:
-        condition: service_started
+        condition: service_healthy
 
   # 后端 celery beat 进程
   oj-backend-celery-beat:
@@ -104,6 +117,9 @@ services:
     environment:
       - PROGRAM=celery_beat
     entrypoint: [ "/bin/sh", "-c", "celery -A OnlineJudge beat -l info -f /app/data/log/celery_beat.log" ]
+    depends_on:
+      oj-backend:
+        condition: service_healthy
 
   # 后端 celery worker 进程
   oj-backend-celery-worker:
@@ -116,6 +132,9 @@ services:
     environment:
       - PROGRAM=celery_worker
     entrypoint: [ "/bin/sh", "-c", "celery -A OnlineJudge worker -l info -f /app/data/log/celery_worker.log" ]
+    depends_on:
+      oj-backend:
+        condition: service_healthy
 
   # Nginx + 前端
   oj-frontend:
@@ -123,7 +142,8 @@ services:
     container_name: oj-frontend
     restart: always
     depends_on:
-      - oj-backend
+      oj-backend:
+        condition: service_healthy
     ports:
       - '80:80'
     volumes:
@@ -160,6 +180,9 @@ services:
       - LANG=C.UTF-8
       - TOKEN=${JUDGE_SERVER_TOKEN}
       # - judger_debug=1
+    depends_on:
+      oj-backend:
+        condition: service_healthy
 
   portainer:
     image: registry.cn-shenzhen.aliyuncs.com/szuoj/portainer:alpine
