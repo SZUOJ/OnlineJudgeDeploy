@@ -1,4 +1,3 @@
-version: '3'
 services:
 
   # 数据库，postgresql
@@ -12,8 +11,6 @@ services:
       timeout: 5s
       retries: 12
       start_period: 30s
-    ports:
-      - '127.0.0.1:5432:5432'
     volumes:
       - pg_data:/var/lib/postgresql/data
     # - ./conf/postgresql.conf:/var/lib/postgresql/data/postgresql.conf:ro  # 挂载自定义配置文件（只读）
