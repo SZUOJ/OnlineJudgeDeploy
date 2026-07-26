@@ -25,6 +25,8 @@ services:
     image: registry.cn-shenzhen.aliyuncs.com/szuoj/pgbouncer:1.21.0
     container_name: oj-pgbouncer
     restart: always
+    # 不继承宿主机的 DNS search 域，避免旧版 c-ares 无法解析 Compose 服务名。
+    dns_search: .
     depends_on:
       oj-postgres:
         condition: service_healthy
