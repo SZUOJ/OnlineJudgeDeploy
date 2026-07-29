@@ -100,7 +100,7 @@ services:
         condition: service_healthy
     volumes:
       - backend_static:/app/backend_static
-      - ./dist/:/app/dist/
+      - ../OnlineJudgeFE/dist/:/app/dist/
 
 volumes:
   backend_static:
