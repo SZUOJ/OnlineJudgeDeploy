@@ -8,3 +8,6 @@ data/*
 
 dist/*
 !dist/.gitkeep
+
+conf/*.token
+conf/.env.judge-node

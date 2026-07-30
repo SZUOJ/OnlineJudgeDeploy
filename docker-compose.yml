@@ -93,8 +93,12 @@ services:
       - ROOT_USERNAME
       - ROOT_PASSWORD
 
-      - JUDGER_SERVER_URL
-      - JUDGE_SERVER_TOKEN
+      - JUDGE_AGENT_ENABLED
+      - JUDGE_AGENT_HEARTBEAT_INTERVAL
+      - JUDGE_AGENT_LEASE_SECONDS
+      - JUDGE_AGENT_OFFLINE_SECONDS
+      - JUDGE_AGENT_MAX_RETRIES
+      - JUDGE_AGENT_TASK_POLL_INTERVAL
 
       - PROGRAM=gunicorn
     depends_on:
@@ -153,35 +157,6 @@ services:
       - ./conf/nginx/url.conf:/etc/nginx/url.conf:ro
       - ./conf/ssl:/app/ssl:ro
       # - ./data/nginx/log:/var/log/nginx  # Nginx日志映射至宿主机
-
-  # 判题机
-  oj-judger:
-    image: registry.cn-shenzhen.aliyuncs.com/szuoj/judge_server:latest
-    container_name: oj-judger
-    restart: always
-    read_only: true
-    cap_drop:
-      - SETPCAP
-      - MKNOD
-      - NET_BIND_SERVICE
-      - SYS_CHROOT
-      - SETFCAP
-      - FSETID
-    tmpfs:
-      - /tmp
-    volumes:
-      - test_case_data:/test_case:ro
-      - ./data/judge_server/log:/log
-      - ./data/judge_server/run:/judger
-    environment:
-      - SERVICE_URL=http://oj-judger:8080
-      - BACKEND_URL=http://oj-backend:8000/api/manage/sys/judge_server/heartbeat/
-      - LANG=C.UTF-8
-      - TOKEN=${JUDGE_SERVER_TOKEN}
-      # - judger_debug=1
-    depends_on:
-      oj-backend:
-        condition: service_healthy
 
   portainer:
     image: registry.cn-shenzhen.aliyuncs.com/szuoj/portainer:alpine

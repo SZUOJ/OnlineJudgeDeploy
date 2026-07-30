@@ -1,0 +1,21 @@
+server:
+  websocket_url: "${JUDGE_AGENT_WS_URL}"
+  file_url: "${JUDGE_AGENT_FILE_URL}"
+  node_id: "${JUDGE_AGENT_NODE_ID}"
+  token_file: "/run/secrets/judge_agent_token"
+  tls_verify: true
+
+agent:
+  name: "${JUDGE_AGENT_NAME}"
+  concurrency: 2
+  languages: ["c", "cpp", "java", "py", "go", "js"]
+  min_priority: 0
+  heartbeat_interval: 10
+
+judge_server:
+  url: "http://judge-server:8080"
+  token_file: "/run/secrets/judge_server_token"
+
+cache:
+  directory: "/test_case"
+  retention_days: 30
