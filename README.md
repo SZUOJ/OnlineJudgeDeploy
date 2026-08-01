@@ -8,13 +8,15 @@ JudgeAgent 主动连接 Backend，并在节点本机完成任务领取、测试�
 
 ### 镜像发布与兼容性前置条件
 
-首次采用本版本或以后更新这套 Deploy 配置时，必须先确认以下三个仓库的对应发布 workflow 已成功完成，并且镜像仓库中的标签已更新：
+部署配置不得依赖临时功能分支标签。各环境固定使用以下镜像发布通道：
 
-- `JudgeAgent` 的 `main` 分支已发布 `registry.cn-shenzhen.aliyuncs.com/szuoj/judge_agent:main`。
-- `OnlineJudge` 的 `JudgeAgent` 分支已发布 `registry.cn-shenzhen.aliyuncs.com/szuoj/backend:JudgeAgent`。
-- `OnlineJudgeFE` 的 `JudgeAgent` 分支已发布 `registry.cn-shenzhen.aliyuncs.com/szuoj/frontend:JudgeAgent`。
+| 环境 | Backend | Frontend | JudgeAgent |
+| --- | --- | --- | --- |
+| 预发布 | `backend:master` | `frontend:master` | `judge_agent:main` |
+| 正式单机 | `backend:latest` | `frontend:latest` | `judge_agent:latest` |
+| 正式远程节点 | 不部署 | 不部署 | `judge_agent:latest` |
 
-三个镜像全部发布成功后，才能更新 `OnlineJudgeDeploy` 的 `JudgeAgent` 分支并执行下面的 `pull`、`up`。如果任一 workflow 失败或对应标签仍是旧镜像，应继续运行旧部署，不要先应用新 Compose。
+首次采用本版本或以后更新这套 Deploy 配置时，必须先确认对应仓库的发布 workflow 已成功完成，并且镜像仓库中的目标标签已经更新。如果任一 workflow 失败或对应标签仍是旧镜像，应继续运行旧部署，不要先执行 `pull`、`up` 应用新 Compose。
 
 新 Compose 的同机 JudgeAgent 使用 `JUDGE_AGENT_NODE_ID_FILE` 和配置项 `server.node_id_file` 从共享卷读取 Backend 自动生成的 Node ID，同时等待 Node ID 与 Token 文件就绪。旧 JudgeAgent 镜像不支持这套文件凭据协议，不能与新 Compose 混用；新 Backend、JudgeAgent 和 Deploy Compose 应作为同一兼容版本一起发布和升级。回滚时也应成套回滚，不能只替换其中一个镜像或配置文件。
 
@@ -30,7 +32,7 @@ docker compose --env-file ./.env up -d --remove-orphans
 
 Backend 启动时会先执行数据库迁移，然后创建或校验受托管的本地判题节点，并将 Node ID 与 Token 原子写入 `judge_agent_credentials` 命名卷。Backend 健康检查通过后，同机 JudgeAgent 才会启动并读取这组凭据，因此单机部署不需要在管理后台手工创建节点，也不需要填写 Node ID 或 Token。
 
-Backend 和 Frontend 固定使用 `JudgeAgent` 镜像标签，同机 JudgeAgent 固定使用 `main` 镜像标签。JudgeAgent 调度始终启用，不再存在 `JUDGE_AGENT_ENABLED` 开关；主站也不使用旧 JudgeServer 的 URL、Token 或 Secret。
+正式部署的 Backend、Frontend 和同机 JudgeAgent 均固定使用 `latest` 镜像标签。JudgeAgent 调度始终启用，不再存在 `JUDGE_AGENT_ENABLED` 开关；主站也不使用旧 JudgeServer 的 URL、Token 或 Secret。
 
 升级前使用 `backup/db_backup.sh` 备份 PostgreSQL，并备份 Compose 命名卷 `test_case_data`、`media_data` 和 `judge_agent_credentials`；如需保留本地题目缓存，也备份 `judge_cache`。之后重复执行上面的 `pull` 和 `up` 命令即可。`pull`、`up` 和 `--remove-orphans` 不会删除命名卷，升级时不要执行 `docker compose down -v`。如果数据库中已有受托管节点而 `judge_agent_credentials` 丢失、损坏或与数据库身份不一致，Backend 会拒绝生成第二套身份并停止启动；应优先恢复该卷的备份，不能通过反复重启绕过。
 
@@ -74,7 +76,7 @@ docker compose \
   up -d --remove-orphans
 ```
 
-远程节点固定使用 JudgeAgent `main` 镜像标签；升级时重复执行上述 `pull` 和 `up` 即可。增加更多判题机时，在每台机器重复此流程并为每个节点创建独立凭据。
+正式远程节点固定使用 JudgeAgent `latest` 镜像标签；升级时重复执行上述 `pull` 和 `up` 即可。增加更多判题机时，在每台机器重复此流程并为每个节点创建独立凭据。
 
 `JUDGE_NODE_CONCURRENCY` 控制该节点同时执行的提交数；`JUDGE_TEST_CASE_WORKERS` 固定为 1，避免每个提交再次放大并发。`JUDGE_AGENT_PIDS_LIMIT` 默认为 512，用于限制容器内全部进程和线程；只有在提高并发且确认 Java/JVM 任务触发 PID 上限时才应调高。`JUDGE_AGENT_TMPFS_SIZE` 默认将可执行的 `/tmp` tmpfs 限制为 512 MiB；只有在可复现的工具链临时空间不足时才应调高。
 

@@ -1,6 +1,6 @@
 services:
   judge-agent:
-    image: registry.cn-shenzhen.aliyuncs.com/szuoj/judge_agent:main
+    image: registry.cn-shenzhen.aliyuncs.com/szuoj/judge_agent:latest
     container_name: oj-judge-agent
     restart: always
     pids_limit: ${JUDGE_AGENT_PIDS_LIMIT:-512}

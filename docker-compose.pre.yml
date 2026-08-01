@@ -65,7 +65,7 @@ services:
 
   # 后端
   oj-backend:
-    image: registry.cn-shenzhen.aliyuncs.com/szuoj/backend:JudgeAgent
+    image: registry.cn-shenzhen.aliyuncs.com/szuoj/backend:master
     container_name: oj-backend
     healthcheck:
       test: [ "CMD", "curl", "--fail", "--silent", "--show-error", "--output", "/dev/null", "http://127.0.0.1:8000/api/info/ready/" ]
@@ -189,7 +189,7 @@ services:
 
   # Nginx + 前端
   oj-frontend:
-    image: registry.cn-shenzhen.aliyuncs.com/szuoj/frontend:JudgeAgent
+    image: registry.cn-shenzhen.aliyuncs.com/szuoj/frontend:master
     container_name: oj-frontend
     restart: always
     depends_on:
