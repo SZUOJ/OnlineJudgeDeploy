@@ -7,19 +7,6 @@ services:
       context: ../JudgeAgent
     container_name: oj-judge-agent-dev
     restart: unless-stopped
-    pids_limit: ${JUDGE_AGENT_PIDS_LIMIT:-512}
-    read_only: true
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - SETPCAP
-      - MKNOD
-      - NET_BIND_SERVICE
-      - SYS_CHROOT
-      - SETFCAP
-      - FSETID
-    tmpfs:
-      - /tmp:exec,mode=1777,size=${JUDGE_AGENT_TMPFS_SIZE:-512m}
     volumes:
       - judge_cache_dev:/test_case
       - ./data/judge_agent/log:/log
@@ -29,17 +16,13 @@ services:
       - JUDGE_AGENT_CONFIG=/etc/judge-agent/config.yaml
       - JUDGE_AGENT_WS_URL=ws://oj-backend:8000/ws/judge/
       - JUDGE_AGENT_FILE_URL=http://oj-backend:8000/api/judge-agent/files/
-      - JUDGE_AGENT_NODE_ID
       - JUDGE_AGENT_NAME=${JUDGE_AGENT_NAME:-local-dev-node}
       - JUDGE_AGENT_CONCURRENCY=${JUDGE_NODE_CONCURRENCY:-2}
       - JUDGE_AGENT_LANGUAGES=${JUDGE_AGENT_LANGUAGES:-c,cpp,java,py,go,js}
       - JUDGE_AGENT_MIN_PRIORITY=${JUDGE_AGENT_MIN_PRIORITY:-0}
-      - JUDGE_AGENT_TOKEN_FILE=/run/secrets/judge_agent_token
       - JUDGE_AGENT_CACHE_DIR=/test_case
       - JUDGE_AGENT_TLS_VERIFY=false
       - JUDGE_TEST_CASE_WORKERS=1
-    secrets:
-      - judge_agent_token
     depends_on:
       oj-backend:
         condition: service_healthy
@@ -136,7 +119,3 @@ services:
 volumes:
   backend_static:
   judge_cache_dev:
-
-secrets:
-  judge_agent_token:
-    file: ./conf/judge-agent.token

@@ -1,0 +1,17 @@
+server:
+  websocket_url: "ws://oj-backend:8000/ws/judge/"
+  file_url: "http://oj-backend:8000/api/judge-agent/files/"
+  node_id_file: "/run/judge-agent-credentials/node-id"
+  token_file: "/run/judge-agent-credentials/node-token"
+  tls_verify: false
+
+agent:
+  name: "local-judge-agent"
+  concurrency: 2
+  languages: ["c", "cpp", "java", "py", "go", "js"]
+  min_priority: 0
+  heartbeat_interval: 10
+
+cache:
+  directory: "/test_case"
+  retention_days: 30
