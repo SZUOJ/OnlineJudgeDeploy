@@ -1,8 +1,9 @@
 services:
   judge-agent:
-    image: registry.cn-shenzhen.aliyuncs.com/szuoj/judge_agent:latest
+    image: registry.cn-shenzhen.aliyuncs.com/szuoj/judge_agent:main
     container_name: oj-judge-agent
     restart: always
+    pids_limit: ${JUDGE_AGENT_PIDS_LIMIT:-512}
     read_only: true
     security_opt:
       - no-new-privileges:true
@@ -14,7 +15,7 @@ services:
       - SETFCAP
       - FSETID
     tmpfs:
-      - /tmp:exec,mode=1777
+      - /tmp:exec,mode=1777,size=${JUDGE_AGENT_TMPFS_SIZE:-512m}
     volumes:
       - judge_cache:/test_case
       - ./data/judge_agent/log:/log
@@ -34,7 +35,6 @@ services:
       - JUDGE_AGENT_CACHE_DIR=/test_case
       - JUDGE_AGENT_CACHE_DAYS=${JUDGE_AGENT_CACHE_DAYS:-30}
       - JUDGE_AGENT_TLS_VERIFY=${JUDGE_AGENT_TLS_VERIFY:-true}
-      - JUDGE_ENGINE_VERSION=${JUDGE_ENGINE_VERSION:-latest}
       - JUDGE_TEST_CASE_WORKERS=1
     secrets:
       - judge_agent_token

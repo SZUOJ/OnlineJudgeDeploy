@@ -6,16 +6,17 @@
 
 1. 配置 `.env` 中的数据库、Redis、管理员和 JudgeAgent 调度参数。
 2. 确保 Nginx 对 `/ws/` 保留 Upgrade 头；仓库配置的长连接超时为 3600 秒。
-3. 启动：
+3. 首次部署或每次升级时，先拉取当前 `JudgeAgent` 分支镜像，再启动：
 
 ```sh
 docker compose --env-file ./.env config
-docker compose --env-file ./.env up -d
+docker compose --env-file ./.env pull
+docker compose --env-file ./.env up -d --remove-orphans
 ```
 
 Backend 启动时会自动执行数据库迁移。JudgeAgent 调度始终启用，不再存在 `JUDGE_AGENT_ENABLED` 开关；主站也不使用 JudgeServer URL、Token 或 Secret。
 
-升级时先备份 PostgreSQL 与 `data/test_case`，再更新镜像并启动主站。迁移会保留已有节点数据，并将节点版本字段从独立 JudgeServer 语义更新为内嵌 JudgeEngine。
+主站的 Backend/Frontend 固定使用 `JudgeAgent` 镜像标签，避免误拉取 master/latest 的旧架构。升级时先使用 `backup/db_backup.sh` 备份 PostgreSQL，并按需备份 Compose 命名卷 `test_case_data` 和 `media_data`，再执行上述 `pull` 和 `up` 命令。`pull`/`up` 和 `--remove-orphans` 都不会删除命名卷；升级时不要执行 `docker compose down -v`。迁移会保留已有节点数据，并将节点版本字段从独立 JudgeServer 语义更新为内嵌 JudgeEngine。
 
 ## 二、新增判题节点
 
@@ -41,10 +42,52 @@ docker compose \
 docker compose \
   -f docker-compose.judge-node.yml \
   --env-file ./conf/.env.judge-node \
-  up -d
+  pull
+
+docker compose \
+  -f docker-compose.judge-node.yml \
+  --env-file ./conf/.env.judge-node \
+  up -d --remove-orphans
 ```
 
-增加更多判题机时，在每台机器重复上述步骤并创建独立节点/Token。`JUDGE_NODE_CONCURRENCY` 控制该节点同时执行的提交数；`JUDGE_TEST_CASE_WORKERS` 固定为 1，避免每个提交再次放大并发。
+判题节点固定使用 JudgeAgent `main` 镜像标签；节点升级时重复执行上述 `pull` 和 `up` 即可。
+
+增加更多判题机时，在每台机器重复上述步骤并创建独立节点/Token。`JUDGE_NODE_CONCURRENCY` 控制该节点同时执行的提交数；`JUDGE_TEST_CASE_WORKERS` 固定为 1，避免每个提交再次放大并发。`JUDGE_AGENT_PIDS_LIMIT` 默认为 512，用于限制容器内全部进程和线程；只有在提高节点并发且确认 Java/JVM 任务触发 PID 上限时才应调高。`JUDGE_AGENT_TMPFS_SIZE` 默认将可执行的 `/tmp` tmpfs 限制为 512 MiB，防止 Java/Node 或恶意提交无限消耗宿主内存；只有在可复现的工具链临时空间不足时才应调高。
+
+### 主站与判题节点部署在同一台生产服务器
+
+先按第一节启动主站并在后台创建节点。然后把判题节点地址改为 Compose 内网地址：
+
+```dotenv
+JUDGE_AGENT_WS_URL=ws://oj-backend:8000/ws/judge/
+JUDGE_AGENT_FILE_URL=http://oj-backend:8000/api/judge-agent/files/
+JUDGE_AGENT_TLS_VERIFY=false
+```
+
+之后始终同时合并主站和判题节点 Compose 文件，避免在同一 Compose project 中把另一组容器当成 orphan：
+
+```sh
+docker compose \
+  --env-file ./.env \
+  --env-file ./conf/.env.judge-node \
+  -f docker-compose.yml \
+  -f docker-compose.judge-node.yml \
+  config
+
+docker compose \
+  --env-file ./.env \
+  --env-file ./conf/.env.judge-node \
+  -f docker-compose.yml \
+  -f docker-compose.judge-node.yml \
+  pull
+
+docker compose \
+  --env-file ./.env \
+  --env-file ./conf/.env.judge-node \
+  -f docker-compose.yml \
+  -f docker-compose.judge-node.yml \
+  up -d --remove-orphans
+```
 
 ## 三、开发环境（主站与判题在同一台服务器）
 

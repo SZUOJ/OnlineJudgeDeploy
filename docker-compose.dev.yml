@@ -7,6 +7,7 @@ services:
       context: ../JudgeAgent
     container_name: oj-judge-agent-dev
     restart: unless-stopped
+    pids_limit: ${JUDGE_AGENT_PIDS_LIMIT:-512}
     read_only: true
     security_opt:
       - no-new-privileges:true
@@ -18,7 +19,7 @@ services:
       - SETFCAP
       - FSETID
     tmpfs:
-      - /tmp:exec,mode=1777
+      - /tmp:exec,mode=1777,size=${JUDGE_AGENT_TMPFS_SIZE:-512m}
     volumes:
       - judge_cache_dev:/test_case
       - ./data/judge_agent/log:/log
@@ -36,7 +37,6 @@ services:
       - JUDGE_AGENT_TOKEN_FILE=/run/secrets/judge_agent_token
       - JUDGE_AGENT_CACHE_DIR=/test_case
       - JUDGE_AGENT_TLS_VERIFY=false
-      - JUDGE_ENGINE_VERSION=${JUDGE_ENGINE_VERSION:-develop}
       - JUDGE_TEST_CASE_WORKERS=1
     secrets:
       - judge_agent_token

@@ -11,3 +11,4 @@ dist/*
 
 conf/*.token
 conf/.env.judge-node
+backup/*.sql
