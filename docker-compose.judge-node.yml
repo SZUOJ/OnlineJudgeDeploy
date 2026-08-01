@@ -1,9 +1,11 @@
 services:
-  judge-server:
-    image: registry.cn-shenzhen.aliyuncs.com/szuoj/judge_server:latest
-    container_name: oj-judge-server
+  judge-agent:
+    image: registry.cn-shenzhen.aliyuncs.com/szuoj/judge_agent:latest
+    container_name: oj-judge-agent
     restart: always
     read_only: true
+    security_opt:
+      - no-new-privileges:true
     cap_drop:
       - SETPCAP
       - MKNOD
@@ -12,30 +14,14 @@ services:
       - SETFCAP
       - FSETID
     tmpfs:
-      - /tmp
-    volumes:
-      - judge_cache:/test_case:ro
-      - ./data/judge_server/log:/log
-      - ./data/judge_server/run:/judger
-    environment:
-      - LANG=C.UTF-8
-      - TOKEN_FILE=/run/secrets/judge_server_token
-      - JUDGE_SERVER_WORKERS=${JUDGE_NODE_CONCURRENCY:-2}
-      - JUDGE_TEST_CASE_WORKERS=1
-      - JUDGE_SERVER_VERSION=${JUDGE_SERVER_VERSION:-latest}
-    secrets:
-      - judge_server_token
-
-  judge-agent:
-    image: registry.cn-shenzhen.aliyuncs.com/szuoj/judge_agent:latest
-    container_name: oj-judge-agent
-    restart: always
-    security_opt:
-      - no-new-privileges:true
+      - /tmp:exec,mode=1777
     volumes:
       - judge_cache:/test_case
+      - ./data/judge_agent/log:/log
+      - ./data/judge_agent/run:/judger
       - ./conf/judge-agent.yaml:/etc/judge-agent/config.yaml:ro
     environment:
+      - LANG=C.UTF-8
       - JUDGE_AGENT_CONFIG=/etc/judge-agent/config.yaml
       - JUDGE_AGENT_WS_URL
       - JUDGE_AGENT_FILE_URL
@@ -45,17 +31,13 @@ services:
       - JUDGE_AGENT_LANGUAGES=${JUDGE_AGENT_LANGUAGES:-c,cpp,java,py,go,js}
       - JUDGE_AGENT_MIN_PRIORITY=${JUDGE_AGENT_MIN_PRIORITY:-0}
       - JUDGE_AGENT_TOKEN_FILE=/run/secrets/judge_agent_token
-      - JUDGE_SERVER_URL=http://judge-server:8080
-      - JUDGE_SERVER_TOKEN_FILE=/run/secrets/judge_server_token
       - JUDGE_AGENT_CACHE_DIR=/test_case
       - JUDGE_AGENT_CACHE_DAYS=${JUDGE_AGENT_CACHE_DAYS:-30}
       - JUDGE_AGENT_TLS_VERIFY=${JUDGE_AGENT_TLS_VERIFY:-true}
+      - JUDGE_ENGINE_VERSION=${JUDGE_ENGINE_VERSION:-latest}
+      - JUDGE_TEST_CASE_WORKERS=1
     secrets:
       - judge_agent_token
-      - judge_server_token
-    depends_on:
-      judge-server:
-        condition: service_healthy
 
 volumes:
   judge_cache:
@@ -63,5 +45,3 @@ volumes:
 secrets:
   judge_agent_token:
     file: ./conf/judge-agent.token
-  judge_server_token:
-    file: ./conf/judge-server.token
