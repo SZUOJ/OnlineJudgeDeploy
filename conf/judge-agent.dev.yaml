@@ -7,7 +7,7 @@ server:
 
 agent:
   name: "local-dev-node"
-  concurrency: 2
+  concurrency: 6
   languages: ["c", "cpp", "java", "py", "go", "js"]
   min_priority: 0
 

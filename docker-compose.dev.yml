@@ -17,7 +17,7 @@ services:
       - JUDGE_AGENT_WS_URL=ws://oj-backend:8000/ws/judge/
       - JUDGE_AGENT_FILE_URL=http://oj-backend:8000/api/judge-agent/files/
       - JUDGE_AGENT_NAME=${JUDGE_AGENT_NAME:-local-dev-node}
-      - JUDGE_AGENT_CONCURRENCY=${JUDGE_NODE_CONCURRENCY:-2}
+      - JUDGE_AGENT_CONCURRENCY=${JUDGE_NODE_CONCURRENCY:-6}
       - JUDGE_AGENT_LANGUAGES=${JUDGE_AGENT_LANGUAGES:-c,cpp,java,py,go,js}
       - JUDGE_AGENT_MIN_PRIORITY=${JUDGE_AGENT_MIN_PRIORITY:-0}
       - JUDGE_AGENT_CACHE_DIR=/test_case

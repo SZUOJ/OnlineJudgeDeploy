@@ -78,7 +78,7 @@ docker compose \
 
 正式远程节点固定使用 JudgeAgent `latest` 镜像标签；升级时重复执行上述 `pull` 和 `up` 即可。增加更多判题机时，在每台机器重复此流程并为每个节点创建独立凭据。
 
-`JUDGE_NODE_CONCURRENCY` 控制该节点同时执行的提交数；`JUDGE_TEST_CASE_WORKERS` 固定为 1，避免每个提交再次放大并发。`JUDGE_AGENT_PIDS_LIMIT` 默认为 512，用于限制容器内全部进程和线程；只有在提高并发且确认 Java/JVM 任务触发 PID 上限时才应调高。`JUDGE_AGENT_TMPFS_SIZE` 默认将可执行的 `/tmp` tmpfs 限制为 512 MiB；只有在可复现的工具链临时空间不足时才应调高。
+`JUDGE_NODE_CONCURRENCY` 控制该节点同时执行的提交数，默认为 6；`JUDGE_TEST_CASE_WORKERS` 固定为 1，避免每个提交再次放大并发。`JUDGE_AGENT_PIDS_LIMIT` 默认为 512，用于限制容器内全部进程和线程；只有在提高并发且确认 Java/JVM 任务触发 PID 上限时才应调高。`JUDGE_AGENT_TMPFS_SIZE` 默认将可执行的 `/tmp` tmpfs 限制为 512 MiB；只有在可复现的工具链临时空间不足时才应调高。
 
 ## 三、开发环境
 
