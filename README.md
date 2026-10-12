@@ -80,6 +80,8 @@ docker compose \
 
 `JUDGE_NODE_CONCURRENCY` 控制该节点同时执行的提交数，默认为 6；`JUDGE_TEST_CASE_WORKERS` 固定为 1，避免每个提交再次放大并发。`JUDGE_AGENT_PIDS_LIMIT` 默认为 512，用于限制容器内全部进程和线程；只有在提高并发且确认 Java/JVM 任务触发 PID 上限时才应调高。`JUDGE_AGENT_TMPFS_SIZE` 默认将可执行的 `/tmp` tmpfs 限制为 512 MiB；只有在可复现的工具链临时空间不足时才应调高。
 
+JudgeAgent 的沙箱外层期限与进程组回收版本必须配合 `init: true` 部署，让被终止任务的孤儿进程得到收割；DEV 从主配置继承此项。更新镜像与 Compose 后需要重建 Agent 容器，单纯 restart 不会加载新的 init 配置。手动 Docker 部署使用 `--init`。故障现场应在重建前保全，因为 Agent 启动脚本会清理判题工作目录；仍在运行的节点不能直接清理其工作目录。
+
 ## 三、开发环境
 
 开发环境同样会自动创建本地判题节点，不需要先启动 Backend 再手工填写凭据。准备好相邻目录中的 `OnlineJudge`、`OnlineJudgeFE` 和 `JudgeAgent` 后，一次启动完整环境：

@@ -112,6 +112,7 @@ services:
   # 默认单机 JudgeAgent。后端在健康前将节点凭据原子写入共享卷。
   judge-agent:
     image: registry.cn-shenzhen.aliyuncs.com/szuoj/judge_agent:main
+    init: true
     container_name: oj-judge-agent
     restart: always
     pids_limit: ${JUDGE_AGENT_PIDS_LIMIT:-512}
